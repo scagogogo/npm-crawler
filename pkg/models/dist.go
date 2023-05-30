@@ -1,4 +1,4 @@
-package model
+package models
 
 type Dist struct {
 	Shasum     string       `json:"shasum"`

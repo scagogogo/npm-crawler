@@ -22,13 +22,13 @@ func NewRegistry(options ...*Options) *Registry {
 }
 
 // GetRegistryInformation 获取registry的状态
-func (x *Registry) GetRegistryInformation(ctx context.Context) (*model.RegistryInformation, error) {
+func (x *Registry) GetRegistryInformation(ctx context.Context) (*models.RegistryInformation, error) {
 	targetUrl := x.options.RegistryURL
 	bytes, err := requests.GetBytes(ctx, targetUrl)
 	if err != nil {
 		return nil, err
 	}
-	r := &model.RegistryInformation{}
+	r := &models.RegistryInformation{}
 	err = json.Unmarshal(bytes, &r)
 	if err != nil {
 		return nil, err
@@ -36,13 +36,13 @@ func (x *Registry) GetRegistryInformation(ctx context.Context) (*model.RegistryI
 	return r, nil
 }
 
-func (x *Registry) GetPackageInformation(ctx context.Context, packageName string) (*model.Package, error) {
+func (x *Registry) GetPackageInformation(ctx context.Context, packageName string) (*models.Package, error) {
 	targetUrl := fmt.Sprintf("%s/%s", x.options.RegistryURL, packageName)
 	bytes, err := requests.GetBytes(ctx, targetUrl)
 	if err != nil {
 		return nil, err
 	}
-	r := &model.Package{}
+	r := &models.Package{}
 	err = json.Unmarshal(bytes, &r)
 	if err != nil {
 		return nil, err

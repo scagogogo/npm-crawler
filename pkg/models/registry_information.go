@@ -1,4 +1,4 @@
-package model
+package models
 
 type RegistryInformation struct {
 	DbName         string `json:"db_name"`

@@ -1,4 +1,4 @@
-package model
+package models
 
 type Script struct {
 	Test  string `json:"test"`
