@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Package struct {
 	ID             string               `json:"_id"`
@@ -21,4 +24,9 @@ type Package struct {
 	ReadmeFilename string               `json:"readmeFilename"`
 	Users          map[string]bool      `json:"users"`
 	Contributors   []*Contributor       `json:"contributors"`
+}
+
+func (x *Package) ToJsonString() string {
+	bytes, _ := json.Marshal(x)
+	return string(bytes)
 }

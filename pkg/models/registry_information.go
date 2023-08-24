@@ -1,5 +1,7 @@
 package models
 
+import "encoding/json"
+
 type RegistryInformation struct {
 	DbName         string `json:"db_name"`
 	Engine         string `json:"engine"`
@@ -23,4 +25,9 @@ type RegistryInformation struct {
 	CommittedUpdateSeq int    `json:"committed_update_seq"`
 	CompactedSeq       int    `json:"compacted_seq"`
 	UUID               string `json:"uuid"`
+}
+
+func (x *RegistryInformation) ToJsonString() string {
+	s, _ := json.Marshal(x)
+	return string(s)
 }

@@ -40,6 +40,10 @@ func (x *Registry) GetPackageInformation(ctx context.Context, packageName string
 	return unmarshalJson[*models.Package](bytes)
 }
 
+func (x *Registry) GetOptions() *Options {
+	return x.options
+}
+
 func unmarshalJson[T any](bytes []byte) (T, error) {
 	var r T
 	err := json.Unmarshal(bytes, &r)
