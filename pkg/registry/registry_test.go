@@ -147,7 +147,7 @@ func TestGetPackageInformation(t *testing.T) {
 	assert.Equal(t, "axios", pkg.ID)
 	assert.Equal(t, "Promise based HTTP client", pkg.Description)
 	assert.NotNil(t, pkg.DistTags)
-	assert.Equal(t, "1.0.0", pkg.DistTags.Latest)
+	assert.Equal(t, "1.0.0", pkg.DistTags["latest"])
 	assert.NotNil(t, pkg.Versions)
 	assert.Contains(t, pkg.Versions, "1.0.0")
 

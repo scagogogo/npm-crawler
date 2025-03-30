@@ -5,6 +5,9 @@ import (
 	"net/url"
 )
 
+// 默认 NPM 仓库地址
+const DefaultRegistryURL = "https://registry.npmjs.org"
+
 // Options 表示 Registry 客户端的配置选项
 //
 // 包含字段:
