@@ -2,11 +2,13 @@
 
 <div align="center">
 
-![Logo](https://raw.githubusercontent.com/npm/logos/master/npm%20logo/npm-logo-red.png)
+<img src="https://cdn.worldvectorlogo.com/logos/npm-2.svg" width="180" alt="NPM Logo" style="filter: brightness(0.9);">
 
 [![Go Tests](https://github.com/scagogogo/npm-crawler/actions/workflows/go-test.yml/badge.svg)](https://github.com/scagogogo/npm-crawler/actions/workflows/go-test.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/scagogogo/npm-crawler.svg)](https://pkg.go.dev/github.com/scagogogo/npm-crawler)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+_高性能的 NPM Registry 客户端，支持多镜像源和代理配置_
 
 </div>
 
