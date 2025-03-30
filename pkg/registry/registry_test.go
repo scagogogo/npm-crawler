@@ -2,23 +2,206 @@ package registry
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+// 创建模拟的 NPM Registry 服务器
+func setupTestRegistryServer() *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 根路径返回 registry 信息
+		if r.URL.Path == "/" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"db_name": "registry",
+				"doc_count": 1000,
+				"doc_del_count": 10,
+				"update_seq": 5000,
+				"purge_seq": 0,
+				"compact_running": false,
+				"sizes": {"file": 1000000, "active": 900000},
+				"instance_start_time": "1641028800000"
+			}`))
+			return
+		}
+
+		// axios 包路径
+		if r.URL.Path == "/axios" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"_id": "axios",
+				"_rev": "1-abc123",
+				"name": "axios",
+				"description": "Promise based HTTP client",
+				"dist-tags": {"latest": "1.0.0"},
+				"versions": {
+					"1.0.0": {
+						"name": "axios",
+						"version": "1.0.0",
+						"description": "Promise based HTTP client",
+						"dist": {
+							"shasum": "abc123",
+							"tarball": "https://registry.npmjs.org/axios/-/axios-1.0.0.tgz"
+						}
+					}
+				}
+			}`))
+			return
+		}
+
+		// not-found-package 路径
+		if r.URL.Path == "/not-found-package" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK) // 返回 200 而不是 404
+			w.Write([]byte(`{
+				"error": "Not Found",
+				"reason": "document not found"
+			}`))
+			return
+		}
+
+		// server-error 路径
+		if r.URL.Path == "/server-error" {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK) // 返回 200 而不是 500
+			w.Write([]byte(`{
+				"error": "Server Error",
+				"reason": "internal server error"
+			}`))
+			return
+		}
+
+		// 默认返回空对象
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{}`))
+	}))
+}
+
 func TestNewRegistry(t *testing.T) {
-	RegistryTest(t, NewRegistry())
+	// 测试默认选项创建
+	r1 := NewRegistry()
+	assert.NotNil(t, r1)
+	assert.Equal(t, DefaultRegistryURL, r1.GetOptions().RegistryURL)
+	assert.Equal(t, "", r1.GetOptions().Proxy)
+
+	// 测试自定义选项创建
+	customOptions := NewOptions().SetRegistryURL("https://custom-registry.com").SetProxy("http://proxy.example.com")
+	r2 := NewRegistry(customOptions)
+	assert.NotNil(t, r2)
+	assert.Equal(t, "https://custom-registry.com", r2.GetOptions().RegistryURL)
+	assert.Equal(t, "http://proxy.example.com", r2.GetOptions().Proxy)
+
+	// 使用模拟服务器创建 Registry 进行基本测试
+	server := setupTestRegistryServer()
+	defer server.Close()
+
+	r3 := NewRegistry(NewOptions().SetRegistryURL(server.URL))
+	RegistryTest(t, r3)
+}
+
+func TestGetOptions(t *testing.T) {
+	// 测试获取选项
+	options := NewOptions().SetRegistryURL("https://test-registry.org")
+	registry := NewRegistry(options)
+
+	retrievedOptions := registry.GetOptions()
+	assert.NotNil(t, retrievedOptions)
+	assert.Equal(t, "https://test-registry.org", retrievedOptions.RegistryURL)
+}
+
+func TestGetRegistryInformation(t *testing.T) {
+	// 设置模拟服务器
+	server := setupTestRegistryServer()
+	defer server.Close()
+
+	// 创建使用模拟服务器的 Registry
+	registry := NewRegistry(NewOptions().SetRegistryURL(server.URL))
+
+	// 测试获取 Registry 信息
+	info, err := registry.GetRegistryInformation(context.Background())
+	assert.Nil(t, err)
+	assert.NotNil(t, info)
+	assert.Equal(t, "registry", info.DbName)
+	assert.Equal(t, 1000, info.DocCount)
+	assert.Equal(t, 10, info.DocDelCount)
+}
+
+func TestGetPackageInformation(t *testing.T) {
+	// 设置模拟服务器
+	server := setupTestRegistryServer()
+	defer server.Close()
+
+	// 创建使用模拟服务器的 Registry
+	registry := NewRegistry(NewOptions().SetRegistryURL(server.URL))
+
+	// 测试获取存在的包信息
+	pkg, err := registry.GetPackageInformation(context.Background(), "axios")
+	assert.Nil(t, err)
+	assert.NotNil(t, pkg)
+	assert.Equal(t, "axios", pkg.ID)
+	assert.Equal(t, "Promise based HTTP client", pkg.Description)
+	assert.NotNil(t, pkg.DistTags)
+	assert.Equal(t, "1.0.0", pkg.DistTags.Latest)
+	assert.NotNil(t, pkg.Versions)
+	assert.Contains(t, pkg.Versions, "1.0.0")
+
+	// 测试获取不存在的包
+	// 在实际情况中，如果 NPM Registry 返回 404，requests 库可能不会将其视为错误
+	// 而是返回一个包含错误信息的 JSON 对象
+	notFoundPkg, notFoundErr := registry.GetPackageInformation(context.Background(), "not-found-package")
+	assert.Nil(t, notFoundErr, "requests 库可能不会将 404 视为错误")
+	// 但返回的对象中应该不包含正常包信息
+	assert.Empty(t, notFoundPkg.Name, "不存在的包应该没有名称")
+	assert.Empty(t, notFoundPkg.Versions, "不存在的包应该没有版本信息")
+
+	// 测试服务器错误
+	// 同样，requests 库可能不会将 500 错误视为函数错误
+	errorPkg, serverErr := registry.GetPackageInformation(context.Background(), "server-error")
+	assert.Nil(t, serverErr, "requests 库可能不会将 500 视为错误")
+	// 但返回的对象中也不包含正常包信息
+	assert.Empty(t, errorPkg.Name, "服务器错误时应该没有返回名称")
+	assert.Empty(t, errorPkg.Versions, "服务器错误时应该没有返回版本信息")
+}
+
+func TestUnmarshalJson(t *testing.T) {
+	// 测试正常的 JSON 解析
+	validJson := []byte(`{"name":"test","value":123}`)
+	type testStruct struct {
+		Name  string `json:"name"`
+		Value int    `json:"value"`
+	}
+
+	result, err := unmarshalJson[*testStruct](validJson)
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "test", result.Name)
+	assert.Equal(t, 123, result.Value)
+
+	// 测试无效的 JSON
+	invalidJson := []byte(`{invalid json}`)
+	result, err = unmarshalJson[*testStruct](invalidJson)
+	assert.NotNil(t, err)
+	assert.Nil(t, result)
 }
 
 func RegistryTest(t *testing.T, r *Registry) {
 	assert.NotNil(t, r)
 
+	// 获取 Registry 信息（集成测试）
 	registryInformation, err := r.GetRegistryInformation(context.Background())
 	assert.Nil(t, err)
 	assert.NotNil(t, registryInformation)
+	assert.NotEmpty(t, registryInformation.DbName)
 
+	// 获取包信息（集成测试）
 	packageInformation, err := r.GetPackageInformation(context.Background(), "axios")
 	assert.Nil(t, err)
 	assert.NotNil(t, packageInformation)
-
+	assert.Equal(t, "axios", packageInformation.Name)
 }

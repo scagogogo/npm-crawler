@@ -1,0 +1,49 @@
+name: Go Tests
+
+# 控制工作流何时运行
+on:
+  # 在推送到任何分支或创建 pull request 时触发
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+  # 允许手动触发工作流
+  workflow_dispatch:
+
+# 一个工作流由一个或多个作业组成，这些作业可以顺序或并行运行
+jobs:
+  # 这个工作流包含一个名为 "test" 的作业
+  test:
+    # 运行作业的操作系统
+    runs-on: ubuntu-latest
+
+    # 步骤代表作业中执行的一系列任务
+    steps:
+    # 检出代码
+    - uses: actions/checkout@v3
+
+    # 设置 Go 环境
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'  # 使用 Go 1.20 版本，可以根据项目需要调整
+        cache: true  # 启用依赖缓存，提高后续运行速度
+
+    # 安装依赖
+    - name: Install dependencies
+      run: go mod download
+
+    # 运行单元测试
+    - name: Run tests
+      run: go test -v ./pkg/...
+
+    # 生成测试覆盖率报告
+    - name: Generate coverage report
+      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./pkg/...
+
+    # 上传覆盖率报告到 Codecov（可选）
+    # - name: Upload coverage to Codecov
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     file: ./coverage.txt
+    #     fail_ci_if_error: false 
