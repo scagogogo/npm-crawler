@@ -15,11 +15,11 @@ func TestPackage(t *testing.T) {
 		Rev:         "1-abc123",
 		Name:        "test-package",
 		Description: "A test package for unit testing",
-		DistTags: &DistTags{
-			Latest: "1.0.0",
-			Next:   "1.1.0",
+		DistTags: map[string]string{
+			"latest": "1.0.0",
+			"next":   "1.1.0",
 		},
-		Versions: map[string]*Version{
+		Versions: map[string]Version{
 			"1.0.0": {
 				Name:        "test-package",
 				Version:     "1.0.0",
@@ -30,42 +30,43 @@ func TestPackage(t *testing.T) {
 				},
 			},
 		},
-		Readme: "# Test Package\nThis is a test package for unit testing.",
-		Maintainers: []*User{
+		ReadMe: "# Test Package\nThis is a test package for unit testing.",
+		Maintainers: []Maintainer{
 			{
 				Name:  "tester",
 				Email: "tester@example.com",
 			},
 		},
-		Time: map[string]time.Time{
-			"created":  time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-			"modified": time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			"1.0.0":    time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		Time: map[string]string{
+			"created":  "2020-01-01T00:00:00Z",
+			"modified": "2021-01-01T00:00:00Z",
+			"1.0.0":    "2020-01-01T00:00:00Z",
 		},
 		Homepage: "https://example.com/test-package",
 		Keywords: []string{"test", "package"},
 		License:  "MIT",
-		Repository: &Repository{
+		Repository: Repository{
 			Type: "git",
 			URL:  "git+https://github.com/example/test-package.git",
 		},
-		Author: &Author{
+		Author: Author{
 			Name: "Test Author",
 		},
-		Bugs: &Bugs{
-			URL: "https://github.com/example/test-package/issues",
+		Bugs: map[string]interface{}{
+			"url": "https://github.com/example/test-package/issues",
 		},
-		ReadmeFilename: "README.md",
+		ReadMeFilename: "README.md",
 		Users: map[string]bool{
 			"user1": true,
 			"user2": true,
 		},
-		Contributors: []*Contributor{
+		Contributors: []Contributor{
 			{
 				Name: "contributor1",
 				URL:  "https://github.com/contributor1",
 			},
 		},
+		Other: map[string]interface{}{},
 	}
 
 	// 基本属性测试
@@ -73,22 +74,22 @@ func TestPackage(t *testing.T) {
 	assert.Equal(t, "test-package", pkg.Name)
 	assert.Equal(t, "A test package for unit testing", pkg.Description)
 
-	// 测试嵌套结构
-	assert.NotNil(t, pkg.DistTags)
-	assert.Equal(t, "1.0.0", pkg.DistTags.Latest)
+	// 测试分发标签
+	assert.Contains(t, pkg.DistTags, "latest")
+	assert.Equal(t, "1.0.0", pkg.DistTags["latest"])
 
 	// 测试版本映射
 	assert.Contains(t, pkg.Versions, "1.0.0")
 	assert.Equal(t, "test-package", pkg.Versions["1.0.0"].Name)
 	assert.Equal(t, "1.0.0", pkg.Versions["1.0.0"].Version)
 
-	// 测试 maintainers 数组
+	// 测试维护者数组
 	assert.Len(t, pkg.Maintainers, 1)
 	assert.Equal(t, "tester", pkg.Maintainers[0].Name)
 
 	// 测试时间映射
 	assert.Contains(t, pkg.Time, "created")
-	assert.Equal(t, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC), pkg.Time["created"])
+	assert.Equal(t, "2020-01-01T00:00:00Z", pkg.Time["created"])
 }
 
 func TestPackageToJsonString(t *testing.T) {
@@ -97,8 +98,8 @@ func TestPackageToJsonString(t *testing.T) {
 		ID:          "simple-package",
 		Name:        "simple-package",
 		Description: "Simple package for testing JSON conversion",
-		DistTags: &DistTags{
-			Latest: "1.0.0",
+		DistTags: map[string]string{
+			"latest": "1.0.0",
 		},
 	}
 
@@ -116,7 +117,7 @@ func TestPackageToJsonString(t *testing.T) {
 	assert.Equal(t, "simple-package", result["name"])
 	assert.Equal(t, "Simple package for testing JSON conversion", result["description"])
 
-	// 验证嵌套结构
+	// 验证分发标签
 	distTags, ok := result["dist-tags"].(map[string]interface{})
 	assert.True(t, ok)
 	assert.Equal(t, "1.0.0", distTags["latest"])
@@ -124,17 +125,19 @@ func TestPackageToJsonString(t *testing.T) {
 
 func TestComplexPackageJsonConversion(t *testing.T) {
 	// 创建一个完整的包对象
-	now := time.Now().UTC()
+	now := time.Now().UTC().Format(time.RFC3339)
+	thirtyDaysAgo := time.Now().UTC().Add(-30 * 24 * time.Hour).Format(time.RFC3339)
+
 	pkg := &Package{
 		ID:          "complex-package",
 		Rev:         "1-xyz789",
 		Name:        "complex-package",
 		Description: "A complex package for testing JSON conversion",
-		DistTags: &DistTags{
-			Latest: "2.0.0",
-			Next:   "2.1.0-next.1",
+		DistTags: map[string]string{
+			"latest": "2.0.0",
+			"next":   "2.1.0-next.1",
 		},
-		Versions: map[string]*Version{
+		Versions: map[string]Version{
 			"1.0.0": {
 				Name:    "complex-package",
 				Version: "1.0.0",
@@ -152,10 +155,10 @@ func TestComplexPackageJsonConversion(t *testing.T) {
 				},
 			},
 		},
-		Time: map[string]time.Time{
-			"created":  now.Add(-30 * 24 * time.Hour),
+		Time: map[string]string{
+			"created":  thirtyDaysAgo,
 			"modified": now,
-			"1.0.0":    now.Add(-30 * 24 * time.Hour),
+			"1.0.0":    thirtyDaysAgo,
 			"2.0.0":    now,
 		},
 	}
@@ -173,10 +176,10 @@ func TestComplexPackageJsonConversion(t *testing.T) {
 	assert.Equal(t, pkg.Name, parsedPkg.Name)
 	assert.Equal(t, pkg.Description, parsedPkg.Description)
 
-	// 验证嵌套结构
-	assert.NotNil(t, parsedPkg.DistTags)
-	assert.Equal(t, pkg.DistTags.Latest, parsedPkg.DistTags.Latest)
-	assert.Equal(t, pkg.DistTags.Next, parsedPkg.DistTags.Next)
+	// 验证分发标签
+	assert.Contains(t, parsedPkg.DistTags, "latest")
+	assert.Equal(t, pkg.DistTags["latest"], parsedPkg.DistTags["latest"])
+	assert.Equal(t, pkg.DistTags["next"], parsedPkg.DistTags["next"])
 
 	// 验证版本映射
 	assert.Contains(t, parsedPkg.Versions, "1.0.0")
