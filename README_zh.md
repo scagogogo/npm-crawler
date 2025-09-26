@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[Switch to English Version](README.md)
+[切换到英文版](README.md)
 
 <img src="https://cdn.worldvectorlogo.com/logos/npm-2.svg" width="180" alt="NPM Logo" style="filter: brightness(0.9);">
 
