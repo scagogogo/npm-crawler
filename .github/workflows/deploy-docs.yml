@@ -15,6 +15,10 @@ on:
 
   # 允许手动触发工作流
   workflow_dispatch:
+  
+  # 定期重新部署（每天凌晨2点，确保文档保持最新）
+  schedule:
+    - cron: '0 2 * * *'
 
 # 设置 GITHUB_TOKEN 的权限
 permissions:

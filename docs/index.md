@@ -82,10 +82,10 @@ func main() {
 | NPM 官方 | https://registry.npmjs.org | 全球 | `NewRegistry()` |
 | 淘宝 NPM | https://registry.npm.taobao.org | 中国 | `NewTaoBaoRegistry()` |
 | NPM Mirror | https://registry.npmmirror.com | 中国 | `NewNpmMirrorRegistry()` |
-| 华为云 | https://mirrors.huaweicloud.com/repository/npm | 中国 | `NewHuaWeiCloudRegistry()` |
-| 腾讯云 | http://mirrors.cloud.tencent.com/npm | 中国 | `NewTencentRegistry()` |
-| CNPM | http://r.cnpmjs.org | 中国 | `NewCnpmRegistry()` |
-| Yarn | https://registry.yarnpkg.com | 全球 | `NewYarnRegistry()` |
+| 华为云 | https://repo.huaweicloud.com/repository/npm | 中国 | `NewHuaWeiCloudRegistry()` |
+| 腾讯云 | https://mirrors.cloud.tencent.com/npm | 中国 | `NewTencentRegistry()` |
+
+更多镜像源配置请参考 [镜像源配置指南](/examples/mirrors)。
 
 ## 为什么选择 NPM Crawler？
 
