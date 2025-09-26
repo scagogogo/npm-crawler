@@ -140,6 +140,100 @@ func (x *Registry) GetPackageInformation(ctx context.Context, packageName string
 	return unmarshalJson[*models.Package](bytes)
 }
 
+// SearchPackages 搜索 NPM 包
+//
+// 参数:
+//   - ctx: 上下文，可用于取消请求或设置超时
+//   - query: 搜索关键字
+//   - limit: 返回结果数量限制，默认为 20
+//
+// 返回值:
+//   - *models.SearchResult: 搜索结果，包含匹配的包列表
+//   - error: 如果请求失败则返回错误
+//
+// 使用示例:
+//
+//	registry := NewRegistry()
+//	ctx := context.Background()
+//	result, err := registry.SearchPackages(ctx, "react", 10)
+//	if err != nil {
+//		// 处理错误
+//	}
+//	for _, pkg := range result.Objects {
+//		fmt.Println("包名:", pkg.Package.Name)
+//	}
+func (x *Registry) SearchPackages(ctx context.Context, query string, limit int) (*models.SearchResult, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	targetUrl := fmt.Sprintf("%s/-/v1/search?text=%s&size=%d", x.options.RegistryURL, query, limit)
+	bytes, err := x.getBytes(ctx, targetUrl)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshalJson[*models.SearchResult](bytes)
+}
+
+// GetPackageVersion 获取指定 NPM 包的特定版本信息
+//
+// 参数:
+//   - ctx: 上下文，可用于取消请求或设置超时
+//   - packageName: 要查询的包名称，例如 "react"、"lodash" 等
+//   - version: 要查询的版本号，例如 "1.0.0"、"latest" 等
+//
+// 返回值:
+//   - *models.Version: 指定版本的详细信息
+//   - error: 如果请求失败则返回错误
+//
+// 使用示例:
+//
+//	registry := NewRegistry()
+//	ctx := context.Background()
+//	version, err := registry.GetPackageVersion(ctx, "react", "18.0.0")
+//	if err != nil {
+//		// 处理错误
+//	}
+//	fmt.Println("版本:", version.Version)
+//	fmt.Println("依赖:", version.Dependencies)
+func (x *Registry) GetPackageVersion(ctx context.Context, packageName, version string) (*models.Version, error) {
+	targetUrl := fmt.Sprintf("%s/%s/%s", x.options.RegistryURL, packageName, version)
+	bytes, err := x.getBytes(ctx, targetUrl)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshalJson[*models.Version](bytes)
+}
+
+// GetDownloadStats 获取指定 NPM 包的下载统计信息
+//
+// 参数:
+//   - ctx: 上下文，可用于取消请求或设置超时
+//   - packageName: 要查询的包名称
+//   - period: 统计周期，例如 "last-day", "last-week", "last-month"
+//
+// 返回值:
+//   - *models.DownloadStats: 下载统计信息
+//   - error: 如果请求失败则返回错误
+//
+// 使用示例:
+//
+//	registry := NewRegistry()
+//	ctx := context.Background()
+//	stats, err := registry.GetDownloadStats(ctx, "react", "last-week")
+//	if err != nil {
+//		// 处理错误
+//	}
+//	fmt.Println("下载次数:", stats.Downloads)
+func (x *Registry) GetDownloadStats(ctx context.Context, packageName, period string) (*models.DownloadStats, error) {
+	baseURL := "https://api.npmjs.org/downloads"
+	targetUrl := fmt.Sprintf("%s/point/%s/%s", baseURL, period, packageName)
+	bytes, err := x.getBytes(ctx, targetUrl)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshalJson[*models.DownloadStats](bytes)
+}
+
 // GetOptions 获取当前 Registry 客户端的配置选项
 //
 // 返回值:
