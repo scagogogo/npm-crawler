@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -87,4 +88,40 @@ func TestOptionsUsage(t *testing.T) {
 	assert.Equal(t, options, retrievedOptions)
 	assert.Equal(t, "https://test-usage.example.com", retrievedOptions.RegistryURL)
 	assert.Equal(t, "http://test-proxy.example.com", retrievedOptions.Proxy)
+}
+
+func TestGetHttpClient(t *testing.T) {
+	// 测试无代理的情况
+	options := NewOptions()
+	client, err := options.GetHttpClient()
+	assert.Nil(t, err)
+	assert.NotNil(t, client)
+	// 无代理时应该返回默认客户端
+	assert.Equal(t, http.DefaultClient, client)
+
+	// 测试有效代理的情况
+	options.SetProxy("http://proxy.example.com:8080")
+	client, err = options.GetHttpClient()
+	assert.Nil(t, err)
+	assert.NotNil(t, client)
+	assert.NotEqual(t, http.DefaultClient, client, "使用代理时不应该返回默认客户端")
+
+	// 测试无效代理URL的情况（使用包含无效字符的URL）
+	options.SetProxy("http://proxy with spaces.com:8080")
+	client, err = options.GetHttpClient()
+	assert.NotNil(t, err, "包含空格的代理URL应该返回错误")
+	assert.Nil(t, client, "无效代理URL时客户端应该为nil")
+
+	// 测试代理URL格式错误的情况（使用无效的URL格式）
+	options.SetProxy("://invalid-url")
+	client, err = options.GetHttpClient()
+	assert.NotNil(t, err, "格式错误的代理URL应该返回错误")
+	assert.Nil(t, client, "格式错误的代理URL时客户端应该为nil")
+
+	// 测试空字符串代理（应该等同于无代理）
+	options.SetProxy("")
+	client, err = options.GetHttpClient()
+	assert.Nil(t, err)
+	assert.NotNil(t, client)
+	assert.Equal(t, http.DefaultClient, client, "空字符串代理应该返回默认客户端")
 }

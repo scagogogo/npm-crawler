@@ -20,26 +20,83 @@ jobs:
     # 步骤代表作业中执行的一系列任务
     steps:
     # 检出代码
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # 设置 Go 环境
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
-        go-version: '1.20'  # 使用 Go 1.20 版本，可以根据项目需要调整
+        go-version: '1.20'  # 使用 Go 1.20 版本，与 go.mod 保持一致
         cache: true  # 启用依赖缓存，提高后续运行速度
 
-    # 安装依赖
-    - name: Install dependencies
-      run: go mod download
+    # 验证模块依赖
+    - name: Verify dependencies
+      run: go mod verify
 
-    # 运行单元测试
+    # 清理和检查依赖
+    - name: Tidy dependencies
+      run: go mod tidy
+
+    # 检查代码格式
+    - name: Check code formatting
+      run: |
+        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          echo "代码格式不正确，请运行 gofmt -s -w ."
+          gofmt -s -l .
+          exit 1
+        fi
+
+    # 静态代码分析
+    - name: Run go vet
+      run: go vet ./...
+
+    # 检查项目是否能正常编译
+    - name: Build project
+      run: go build ./...
+
+    # 编译示例程序
+    - name: Build examples
+      run: go build ./examples/...
+
+    # 运行所有单元测试
     - name: Run tests
-      run: go test -v ./pkg/...
+      run: go test -v ./...
+
+    # 运行竞速检测测试
+    - name: Run race tests
+      run: go test -race ./...
 
     # 生成测试覆盖率报告
     - name: Generate coverage report
-      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./pkg/...
+      run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+    # 检查覆盖率阈值（可选）
+    - name: Check coverage threshold
+      run: |
+        coverage=$(go tool cover -func=coverage.txt | grep total: | awk '{print $3}' | sed 's/%//')
+        echo "当前测试覆盖率: ${coverage}%"
+        # 设置最低覆盖率阈值为80%
+        threshold=80
+        if [ "$(echo "$coverage < $threshold" | awk '{print ($1 < $3)}')" = "1" ]; then
+          echo "警告：测试覆盖率 (${coverage}%) 低于阈值 (${threshold}%)"
+          exit 1
+        else
+          echo "测试覆盖率 (${coverage}%) 满足要求 (>= ${threshold}%)"
+        fi
+
+    # 生成覆盖率HTML报告
+    - name: Generate coverage HTML report
+      run: go tool cover -html=coverage.txt -o coverage.html
+
+    # 上传覆盖率报告作为artifact
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-reports
+        path: |
+          coverage.txt
+          coverage.html
+        retention-days: 30
 
     # 上传覆盖率报告到 Codecov（可选）
     # - name: Upload coverage to Codecov
