@@ -1177,4 +1177,4 @@ func main() {
 
 ## 许可证
 
-本文档是 NPM Crawler 项目的一部分，采用 MIT 许可证。详情请参阅 [LICENSE](LICENSE)。
+本文档是 NPM Crawler 项目的一部分，采用 MIT 许可证。详情请参阅 [LICENSE](https://github.com/scagogogo/npm-crawler/blob/main/LICENSE)。

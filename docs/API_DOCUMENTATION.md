@@ -1169,4 +1169,4 @@ For more information, see our [Contributing Guide](https://github.com/scagogogo/
 
 ## License
 
-This documentation is part of the NPM Crawler project and is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This documentation is part of the NPM Crawler project and is licensed under the MIT License. See [LICENSE](https://github.com/scagogogo/npm-crawler/blob/main/LICENSE) for details.
