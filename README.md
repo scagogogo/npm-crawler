@@ -64,8 +64,13 @@ func main() {
     }
     
     fmt.Printf("包名: %s\n", pkg.Name)
+    // 输出: 包名: react
+    
     fmt.Printf("描述: %s\n", pkg.Description)
+    // 输出: 描述: React is a JavaScript library for building user interfaces.
+    
     fmt.Printf("最新版本: %s\n", pkg.DistTags["latest"])
+    // 输出: 最新版本: 18.2.0
     
     // 获取 Registry 信息
     info, err := client.GetRegistryInformation(ctx)
@@ -74,7 +79,10 @@ func main() {
     }
     
     fmt.Printf("Registry 名称: %s\n", info.DbName)
+    // 输出: Registry 名称: registry
+    
     fmt.Printf("包总数: %d\n", info.DocCount)
+    // 输出: 包总数: 2400000
 }
 ```
 
@@ -109,7 +117,10 @@ func main() {
     }
     
     fmt.Printf("包名: %s\n", pkg.Name)
+    // 输出: 包名: react
+    
     fmt.Printf("描述: %s\n", pkg.Description)
+    // 输出: 描述: React is a JavaScript library for building user interfaces.
 }
 ```
 

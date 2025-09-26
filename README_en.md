@@ -64,8 +64,13 @@ func main() {
     }
     
     fmt.Printf("Package Name: %s\n", pkg.Name)
+    // Output: Package Name: react
+    
     fmt.Printf("Description: %s\n", pkg.Description)
+    // Output: Description: React is a JavaScript library for building user interfaces.
+    
     fmt.Printf("Latest Version: %s\n", pkg.DistTags["latest"])
+    // Output: Latest Version: 18.2.0
     
     // Get Registry information
     info, err := client.GetRegistryInformation(ctx)
@@ -74,7 +79,10 @@ func main() {
     }
     
     fmt.Printf("Registry Name: %s\n", info.DbName)
+    // Output: Registry Name: registry
+    
     fmt.Printf("Total Packages: %d\n", info.DocCount)
+    // Output: Total Packages: 2400000
 }
 ```
 
@@ -109,7 +117,10 @@ func main() {
     }
     
     fmt.Printf("Package Name: %s\n", pkg.Name)
+    // Output: Package Name: react
+    
     fmt.Printf("Description: %s\n", pkg.Description)
+    // Output: Description: React is a JavaScript library for building user interfaces.
 }
 ```
 
