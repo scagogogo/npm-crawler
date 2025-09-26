@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[Switch to English Version](README_en.md)
+[Switch to English Version](README.md)
 
 <img src="https://cdn.worldvectorlogo.com/logos/npm-2.svg" width="180" alt="NPM Logo" style="filter: brightness(0.9);">
 
@@ -130,7 +130,7 @@ func main() {
 
 #### 创建 Registry 客户端
 
-``go
+```go
 // NewRegistry 创建一个新的 Registry 客户端实例
 //
 // 参数:
@@ -143,7 +143,7 @@ func NewRegistry(options ...*Options) *Registry
 
 #### 创建特定镜像源的客户端
 
-``go
+```go
 // 创建使用淘宝 NPM 镜像源的 Registry 客户端
 func NewTaoBaoRegistry() *Registry
 
