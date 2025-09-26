@@ -48,16 +48,16 @@ type SearchObject struct {
 //   - Publisher: 发布者信息
 //   - Maintainers: 维护者列表
 type SearchPackage struct {
-	Name         string        `json:"name"`         // 包名称
-	Scope        string        `json:"scope"`        // 包作用域
-	Version      string        `json:"version"`      // 版本号
-	Description  string        `json:"description"`  // 包描述
-	Keywords     []string      `json:"keywords"`     // 关键词
-	Date         string        `json:"date"`         // 发布日期
-	Links        Links         `json:"links"`        // 相关链接
-	Author       *User         `json:"author"`       // 作者
-	Publisher    *User         `json:"publisher"`    // 发布者
-	Maintainers  []*User       `json:"maintainers"`  // 维护者列表
+	Name        string   `json:"name"`        // 包名称
+	Scope       string   `json:"scope"`       // 包作用域
+	Version     string   `json:"version"`     // 版本号
+	Description string   `json:"description"` // 包描述
+	Keywords    []string `json:"keywords"`    // 关键词
+	Date        string   `json:"date"`        // 发布日期
+	Links       Links    `json:"links"`       // 相关链接
+	Author      *User    `json:"author"`      // 作者
+	Publisher   *User    `json:"publisher"`   // 发布者
+	Maintainers []*User  `json:"maintainers"` // 维护者列表
 }
 
 // Links 表示包的相关链接信息
@@ -95,7 +95,6 @@ type ScoreDetail struct {
 	Popularity  float64 `json:"popularity"`  // 流行度得分
 	Maintenance float64 `json:"maintenance"` // 维护状态得分
 }
-
 
 // ToJsonString 将 SearchResult 对象转换为 JSON 字符串
 //

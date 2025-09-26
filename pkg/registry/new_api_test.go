@@ -12,7 +12,7 @@ import (
 
 func TestSearchPackages(t *testing.T) {
 	t.Skip("跳过网络依赖的测试，避免CI/CD环境中的不稳定性")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -37,7 +37,7 @@ func TestSearchPackages(t *testing.T) {
 
 func TestSearchPackagesWithLimit(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -54,7 +54,7 @@ func TestSearchPackagesWithLimit(t *testing.T) {
 
 func TestSearchPackagesDefaultLimit(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -72,7 +72,7 @@ func TestSearchPackagesDefaultLimit(t *testing.T) {
 
 func TestGetPackageVersion(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -91,7 +91,7 @@ func TestGetPackageVersion(t *testing.T) {
 
 func TestGetPackageVersionLatest(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -110,7 +110,7 @@ func TestGetPackageVersionLatest(t *testing.T) {
 
 func TestGetDownloadStats(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -130,7 +130,7 @@ func TestGetDownloadStats(t *testing.T) {
 
 func TestGetDownloadStatsLastDay(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -148,7 +148,7 @@ func TestGetDownloadStatsLastDay(t *testing.T) {
 
 func TestGetDownloadStatsLastMonth(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	registry := NewRegistry()
 	ctx := context.Background()
 
@@ -167,7 +167,7 @@ func TestGetDownloadStatsLastMonth(t *testing.T) {
 // 测试各种镜像源是否支持新的API
 func TestNewAPIWithDifferentMirrors(t *testing.T) {
 	t.Skip("跳过网络依赖的测试")
-	
+
 	ctx := context.Background()
 
 	mirrors := []struct {
